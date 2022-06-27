@@ -1,11 +1,11 @@
-def visualize_batch(all_iter_orig_batch, all_iter_tag_batch, origs, preds, file_path):
+def visualize(all_iter_origs, all_iter_tags, origs, preds, file_path):
     with open(file_path, 'w') as fp:
-        for all_iter_orig, all_iter_tag, orig_tokens, pred_tokens \
-            in zip(all_iter_orig_batch, all_iter_tag_batch, origs, preds):
+        for all_iter_orig, all_iter_tag, orig_sent, pred_tokens \
+            in zip(all_iter_origs, all_iter_tags, origs, preds):
             n_iter = 0
             # print('Original:', ' '.join(orig_tokens))
             # print('Prediction:', ' '.join(pred_tokens))
-            fp.write('Original:   ' + ' '.join(orig_tokens) + '\n')
+            fp.write('Original:   ' + orig_sent + '\n')
             fp.write('Prediction: ' + ' '.join(pred_tokens) + '\n')
             for orig_toekns, tags in zip(all_iter_orig, all_iter_tag):
                 if ''.join(tags) == '':

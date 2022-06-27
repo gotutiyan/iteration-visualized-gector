@@ -11,32 +11,22 @@ def predict_for_file(input_file, output_file, model, batch_size=32, to_normalize
     predictions = []
     cnt_corrections = 0
     batch = []
+    all_iter_origs = []
+    all_iter_tags = []
     for sent in test_data:
         batch.append(sent.split())
         if len(batch) == batch_size:
             preds, cnt, all_iter_orig_batch, all_iter_tag_batch = model.handle_batch(batch)
-            if visualize_file:
-                visualizer.visualize_batch(
-                    all_iter_orig_batch,
-                    all_iter_tag_batch,
-                    batch,
-                    preds,
-                    visualize_file
-                )
             predictions.extend(preds)
+            all_iter_origs.extend(all_iter_orig_batch)
+            all_iter_tags.extend(all_iter_tag_batch)
             cnt_corrections += cnt
             batch = []
     if batch:
         preds, cnt, all_iter_orig_batch, all_iter_tag_batch = model.handle_batch(batch)
-        if visualize_file:
-            visualizer.visualize_batch(
-                all_iter_orig_batch,
-                all_iter_tag_batch,
-                batch,
-                preds,
-                visualize_file
-            )
         predictions.extend(preds)
+        all_iter_origs.extend(all_iter_orig_batch)
+        all_iter_tags.extend(all_iter_tag_batch)
         cnt_corrections += cnt
 
     result_lines = [" ".join(x) for x in predictions]
@@ -45,6 +35,14 @@ def predict_for_file(input_file, output_file, model, batch_size=32, to_normalize
 
     with open(output_file, 'w') as f:
         f.write("\n".join(result_lines) + '\n')
+    if args.visualize:
+        visualizer.visualize(
+            all_iter_origs,
+            all_iter_tags,
+            test_data,
+            predictions,
+            visualize_file
+        )
     return cnt_corrections
 
 
