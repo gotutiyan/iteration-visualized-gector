@@ -2,9 +2,11 @@ import argparse
 
 from utils.helpers import read_lines, normalize
 from gector.gec_model import GecBERTModel
+from gector.visualized_gec_model import VisualizedGecBERTModel
+import visualizer
 
 
-def predict_for_file(input_file, output_file, model, batch_size=32, to_normalize=False):
+def predict_for_file(input_file, output_file, model, batch_size=32, to_normalize=False, visualize_file=False):
     test_data = read_lines(input_file)
     predictions = []
     cnt_corrections = 0
@@ -12,12 +14,28 @@ def predict_for_file(input_file, output_file, model, batch_size=32, to_normalize
     for sent in test_data:
         batch.append(sent.split())
         if len(batch) == batch_size:
-            preds, cnt = model.handle_batch(batch)
+            preds, cnt, all_iter_orig_batch, all_iter_tag_batch = model.handle_batch(batch)
+            if visualize_file:
+                visualizer.visualize_batch(
+                    all_iter_orig_batch,
+                    all_iter_tag_batch,
+                    batch,
+                    preds,
+                    visualize_file
+                )
             predictions.extend(preds)
             cnt_corrections += cnt
             batch = []
     if batch:
-        preds, cnt = model.handle_batch(batch)
+        preds, cnt, all_iter_orig_batch, all_iter_tag_batch = model.handle_batch(batch)
+        if visualize_file:
+            visualizer.visualize_batch(
+                all_iter_orig_batch,
+                all_iter_tag_batch,
+                batch,
+                preds,
+                visualize_file
+            )
         predictions.extend(preds)
         cnt_corrections += cnt
 
@@ -32,7 +50,7 @@ def predict_for_file(input_file, output_file, model, batch_size=32, to_normalize
 
 def main(args):
     # get all paths
-    model = GecBERTModel(vocab_path=args.vocab_path,
+    model = VisualizedGecBERTModel(vocab_path=args.vocab_path,
                          model_paths=args.model_path,
                          max_len=args.max_len, min_len=args.min_len,
                          iterations=args.iteration_count,
@@ -48,7 +66,8 @@ def main(args):
 
     cnt_corrections = predict_for_file(args.input_file, args.output_file, model,
                                        batch_size=args.batch_size, 
-                                       to_normalize=args.normalize)
+                                       to_normalize=args.normalize,
+                                       visualize_file=args.visualize)
     # evaluate with m2 or ERRANT
     print(f"Produced overall corrections: {cnt_corrections}")
 
@@ -124,5 +143,7 @@ if __name__ == '__main__':
     parser.add_argument('--normalize',
                         help='Use for text simplification.',
                         action='store_true')
+    parser.add_argument('--visualize',
+                        help='Whether to visualize iteration inference')
     args = parser.parse_args()
     main(args)

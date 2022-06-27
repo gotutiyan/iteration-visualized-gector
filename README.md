@@ -1,3 +1,29 @@
+# Iteration Visualized GECToR
+
+This is an extension to visualize iterative inference of GECToR.
+
+You can use `--visualize` option for `predict.py`
+
+```.bash
+python predict.py --model_path MODEL_PATH [MODEL_PATH ...] \
+                  --vocab_path VOCAB_PATH --input_file INPUT_FILE \
+                  --output_file OUTPUT_FILE
+                  --visualize VISUALIZATION_OUTPUT_FILE
+```
+
+The visualization outputs will be like this:
+```
+Original:   A ten years old boy go school
+Prediction: A ten - year old boy goes to school
+----- Iteration 1 -----
+A ten       years                         old boy go                     school
+  $APPEND_- $TRANSFORM_AGREEMENT_SINGULAR         $TRANSFORM_VERB_VB_VBZ       
+----- Iteration 2 -----
+A ten - year old boy goes       school
+                     $APPEND_to       
+```
+
+
 # GECToR – Grammatical Error Correction: Tag, Not Rewrite
 
 This repository provides code for training and testing state-of-the-art models for grammatical error correction with the official PyTorch implementation of the following paper:
