@@ -7,7 +7,7 @@ You can use `--visualize` option for `predict.py`
 ```.bash
 python predict.py --model_path MODEL_PATH [MODEL_PATH ...] \
                   --vocab_path VOCAB_PATH --input_file INPUT_FILE \
-                  --output_file OUTPUT_FILE
+                  --output_file OUTPUT_FILE \
                   --visualize VISUALIZATION_OUTPUT_FILE
 ```
 
